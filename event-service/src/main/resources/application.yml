@@ -1,0 +1,18 @@
+live-score:
+  external-base-url: http://external-service:8081/api/events/
+  polling-ms: 10000        # 10 s
+
+spring:
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+
+logging:
+  level:
+    com.example.livescore: INFO
+
+event-store:
+  persistence-path: ${EVENT_STORE_FILE:event-status.json}
+
+score-publisher:
+  topic: ${SCORE_TOPIC:live-scores}
+
