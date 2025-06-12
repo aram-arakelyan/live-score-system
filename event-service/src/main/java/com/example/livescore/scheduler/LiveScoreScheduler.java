@@ -26,7 +26,8 @@ public class LiveScoreScheduler {
                 var score = fetcher.fetch(eventId);
                 publisher.publish(eventId, score);
             } catch (Exception ignored) {
-                log.debug("Skipped {} due to exception (logged inside service)", eventId);            }
+                log.debug("Skipped {} due to exception (logged inside service)", eventId);
+            }
         });
     }
 }

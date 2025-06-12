@@ -13,8 +13,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 public class EventScoreFetcher {
 
-    private final RestTemplate  restTemplate;
-    private final String        externalBase;   // immutable
+    private final RestTemplate restTemplate;
+    private final String externalBase;   // immutable
 
     public EventScoreFetcher(
             RestTemplate restTemplate,

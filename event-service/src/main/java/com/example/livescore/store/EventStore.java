@@ -33,7 +33,9 @@ public class EventStore {
         this.persistence = new File(filePath);
     }
 
-    /** Called by the controller threads */
+    /**
+     * Called by the controller threads
+     */
     public void setStatus(String eventId, EventStatus status) {
         lock.readLock().lock();                 // shared lock: many writers allowed
         try {
@@ -44,7 +46,9 @@ public class EventStore {
         }
     }
 
-    /** Called by the scheduler thread once per poll cycle */
+    /**
+     * Called by the scheduler thread once per poll cycle
+     */
     public Map<String, Boolean> getAndClearSnapshot() {
         lock.writeLock().lock();                // exclusive: blocks writers temporarily
         try {
@@ -61,7 +65,8 @@ public class EventStore {
         lock.writeLock().lock();                // exclusive during startup only
         try {
             if (persistence.exists()) {
-                TypeReference<Map<String, Boolean>> type = new TypeReference<>() {};
+                TypeReference<Map<String, Boolean>> type = new TypeReference<>() {
+                };
                 Map<String, Boolean> saved = mapper.readValue(persistence, type);
                 statusMap.putAll(saved);
                 log.info("Restored {} event statuses from {}", saved.size(), persistence);
