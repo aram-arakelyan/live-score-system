@@ -1,0 +1,31 @@
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports: ["2181:2181"]
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    depends_on: [zookeeper]
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    ports: ["9092:9092"]
+
+  external-service:
+    build: ./external-service
+    ports: ["8081:8081"]
+
+  event-service:
+    build: ./event-service
+    depends_on: [kafka, external-service]
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      EVENT_STORE_FILE: /var/data/event-status.json
+      SCORE_TOPIC: live-scores
+    volumes:
+      - ./data:/var/data
+    ports: ["8080:8080"]
