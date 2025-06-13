@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -26,7 +26,7 @@ class EventStatusControllerTest {
     ObjectMapper mapper;
 
     @SpyBean
-    EventStore store;   // spy to verify interaction
+    EventStore store;   // verify interactions
 
     @Test
     void acceptsValidPayload() throws Exception {
@@ -39,8 +39,8 @@ class EventStatusControllerTest {
 
         ArgumentCaptor<String> idCap = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<EventStatus> stCap = ArgumentCaptor.forClass(EventStatus.class);
-
         verify(store).setStatus(idCap.capture(), stCap.capture());
+
         assertThat(idCap.getValue()).isEqualTo("GAME1");
         assertThat(stCap.getValue()).isEqualTo(EventStatus.LIVE);
     }
@@ -48,7 +48,7 @@ class EventStatusControllerTest {
     @Test
     void rejectsMissingEventId() throws Exception {
         String badJson = """
-                    {"eventId":"", "status":"LIVE"}
+                {"eventId":"", "status":"LIVE"}
                 """;
 
         mvc.perform(post("/events/status")

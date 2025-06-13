@@ -30,8 +30,9 @@ class EventScoreFetcherTest {
     void returnsScore() {
         mock.expect(once(), requestTo("http://external-service:8081/api/events/E1/score"))
                 .andRespond(withSuccess("""
-                             {"eventId":"E1","currentScore":"1:0"}
+                            {"eventId":"E1","currentScore":"1:0"}
                         """, MediaType.APPLICATION_JSON));
+
         var score = fetcher.fetch("E1");
         assertThat(score).isEqualTo(new ScoreResponse("E1", "1:0"));
     }

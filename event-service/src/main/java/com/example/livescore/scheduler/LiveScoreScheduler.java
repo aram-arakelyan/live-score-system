@@ -19,13 +19,11 @@ public class LiveScoreScheduler {
 
     @Scheduled(fixedDelayString = "${live-score.polling-ms}", initialDelay = 5_000)
     public void poll() {
-        var snapshot = store.getAndClearSnapshot();
-        snapshot.forEach((eventId, isLive) -> {
-            if (!isLive) return;
+        store.snapshotLiveOnly().keySet().forEach(eventId -> {
             try {
                 var score = fetcher.fetch(eventId);
                 publisher.publish(eventId, score);
-            } catch (Exception ignored) {
+            } catch (Exception ex) {
                 log.debug("Skipped {} due to exception (logged inside service)", eventId);
             }
         });

@@ -33,28 +33,27 @@ public class EventStore {
         this.persistence = new File(filePath);
     }
 
-    /**
-     * Called by the controller threads
-     */
-    public void setStatus(String eventId, EventStatus status) {
-        lock.readLock().lock();                 // shared lock: many writers allowed
+    public Map<String, Boolean> snapshotLiveOnly() {
+        lock.readLock().lock();
         try {
-            statusMap.put(eventId, status == EventStatus.LIVE);
-            log.info("Event {} status → {}", eventId, status);
+            // copy *only* events that are currently live
+            Map<String, Boolean> copy = new HashMap<>();
+            statusMap.forEach((id, isLive) -> { if (isLive) copy.put(id, true); });
+            return copy;
         } finally {
             lock.readLock().unlock();
         }
     }
 
-    /**
-     * Called by the scheduler thread once per poll cycle
-     */
-    public Map<String, Boolean> getAndClearSnapshot() {
-        lock.writeLock().lock();                // exclusive: blocks writers temporarily
+    public void setStatus(String eventId, EventStatus status) {
+        lock.writeLock().lock();
         try {
-            Map<String, Boolean> copy = new HashMap<>(statusMap);
-            statusMap.clear();
-            return copy;
+            if (status == EventStatus.NOT_LIVE) {
+                statusMap.remove(eventId);          // free memory
+            } else {
+                statusMap.put(eventId, true);
+            }
+            log.info("Event {} status → {}", eventId, status);
         } finally {
             lock.writeLock().unlock();
         }
